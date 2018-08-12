@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="./lib/app.css" />
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+        <script>
+                window.fbAsyncInit = function() {
+                  FB.init({
+                    appId            : '2058258811156993',
+                    autoLogAppEvents : true,
+                    xfbml            : true,
+                    version          : 'v3.1'
+                  });
+                };
+            
+                (function(d, s, id){
+                  var js, fjs = d.getElementsByTagName(s)[0];
+                  if (d.getElementById(id)) {return;}
+                  js = d.createElement(s); js.id = id;
+                  js.src = "https://connect.facebook.net/en_US/sdk.js";
+                  fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));
+            
+                function checkLoginState(){
+                    //cek user lagi login or ga. Kita bs cek dari statusnya
+                    FB.getLoginStatus(function(response) {
+                        console.log("response => ", response)
+                        if(response.status === "connected"){
+                            //kita akses route /login dan kirim authResponse sebagai req.body
+                            axios.post("http://localhost:3000/api/users/login", response.authResponse)
+                              .then(result=>{ 
+                                console.log("result dari server ===>",result)
+                                let token = result.data.token
+                                console.log("ini jwt token dari server ===>", token) //ini token yg uda kita generate di server
+                                localStorage.setItem('token', token)
+                                sessionStorage.current_user = result.data.current_user 
+                                //token ini bt kasi user akses ke api kita 
+                                $("#info").addClass("success").text(result.data.msg)
+                              })
+                              .catch(err=>{console.log(err)})
+                        }   
+                    });
+                }
+    </script>
+        
+            <div class ="ui container">
+                <div class="ui secondary pointing menu">
+                    <a id="home" class="item">Home</a>
+                    <a id="todo" class="item">Todos</a>
+                    <div class="right menu">
+                        <a id="login" class="active ui item">Login</a>
+                        <a id="logout" class="ui item">Logout</a>
+                    </div>
+                </div>
+            </div>
+
+            <header>
+                    <h1>Please Login...</h1>
+                    <h2 id="info"></h2>
+                    <fb:login-button size="xlarge" scope="public_profile,email" onlogin="checkLoginState();">Login with Facebook</fb:login-button>             
+            </header>
+            
+
+    
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="./lib/index.js"></script>
+
+</body>
+</html>

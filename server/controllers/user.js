@@ -8,21 +8,25 @@ module.exports = {
         console.log("req.body => ", req.body)
         let authResponse = req.body
         let url_user_info = `https://graph.facebook.com/me?fields=id,name,email&access_token=${authResponse.accessToken}`
-        
+        console.log("url_user_info ==>", `https://graph.facebook.com/me?fields=id,name,email&access_token=${authResponse.accessToken}`)
         axios.get(url_user_info)
             .then(userFb =>{
                 console.log("user's data :", userFb.data)
                 User.find({email : userFb.data.email})
                     .then(user=>{
                       if(user.length>0){
-                        console.log(`${user.name} is found in DB!`)
+                        console.log(`${user[0].name} is found in DB!`)
                         console.log('user ', user[0])
                         req.session.current_user = user[0].name;
                         console.log('logging in ', req.session.current_user)
                         let token = jwt.sign({id : user[0]._id, role : user[0].role},  process.env.SECRET_KEY)
+                        let id = user[0]._id;
+                        console.log("token",token)
+                        console.log("id", id)
                         res.status(200).json({
                             msg : `${user[0].name} has successfully logged in!`,
                             token,
+                            id,
                             current_user : req.session.current_user
                         })
                       } else {
@@ -37,9 +41,13 @@ module.exports = {
                                 console.log("Successfully adding a new user =>", newUser)
                                 req.session.current_user = newUser.name;
                                 let token = jwt.sign({id : newUser._id, role : newUser.role},  process.env.SECRET_KEY)
+                                let id = newUser._id;
+                                console.log("token",token)
+                                console.log("id", id)
                                 res.status(201).json({
                                     msg: `${newUser.name} is successfully registered and logged in`, 
                                     token,
+                                    id,
                                     current_user : req.session.current_user
                                 })
                             })

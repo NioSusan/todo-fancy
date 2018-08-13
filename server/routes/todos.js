@@ -6,7 +6,7 @@ const auth =  require('../helpers/auth');
 const authUser  = auth(['customer', 'admin'])
 const authAdmin = auth(['admin'])
 
-router.get('/', isLogin, authAdmin, getTodos);
+router.get('/', isLogin, authUser, getTodos);
 router.post('/', isLogin, authUser, newTodo);
 router.get('/:todoId',isLogin, authUser, getTodo);
 router.put('/:todoId',isLogin, authUser, updateTodo);

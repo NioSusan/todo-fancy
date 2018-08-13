@@ -12,19 +12,30 @@ $(document).ready(function(){
     $("#listTodos").click(function(){
        //1. GET /api/todos
         const token = localStorage.getItem("token")
+        const id = localStorage.getItem("id")
         const current_user = sessionStorage.current_user
         $.ajax({
             type: 'GET',
             url : `${base_url}/api/todos`,
             headers: {
                 "token": token,
-                "session": current_user
+                "id" : id,
+                "session": current_user,
             }
         })
-       .then(addTodos)
+       .then(todos=>{
+            console.log("ini todos dari server: ", todos)
+            if(!todos.length){
+                $("#info").addClass("error").text("No todos");
+            }else{
+                todos.forEach(todo=>{
+                    addTodo(todo)
+                })
+            }
+            $("#listTodos").remove()
+       })
        .catch(err=>{
            console.log(err)
-          
        })
     })
 
@@ -41,6 +52,7 @@ $(document).ready(function(){
         if(sessionStorage.getItem('current_user')!==null){
             $("span").addClass("success").text(`Sayonara, ${sessionStorage.getItem('current_user')}!`)
             localStorage.removeItem('token');
+            localStorage.removeItem('id');
             sessionStorage.removeItem('current_user');
             console.log('successfully clearing localStorage and sessionStorage')
         }
@@ -69,7 +81,6 @@ $(document).ready(function(){
 });
 
 function addTodo(todo){
-  
     const newTodo = $('<li class="task">'+todo.name +' <span> X</span></li>')
     newTodo.data('id', todo._id); //this is the method to store the data (here is the todo._id) we get from the server
     newTodo.data('completed', todo.completed) //to store the todo.completed
@@ -80,23 +91,18 @@ function addTodo(todo){
    
 }
 
-function addTodos(todos){
-    //add todos to page
-    todos.forEach(todo=>{
-        addTodo(todo)
-    })
-}
-
 function createTodo(){
     const userInput = $('#todoInput').val();
-    const token = localStorage.getItem("token")
-    const current_user = sessionStorage.current_user
+    const token = localStorage.getItem("token");
+    const id = localStorage.getItem("id");
+    const current_user = sessionStorage.current_user;
     //send request to create new todo
     $.ajax({
         type: 'POST',
         url : `${base_url}/api/todos`,
         headers: {
             "token": token,
+            "id": id,
             "session": current_user
         },
         data: {
@@ -117,13 +123,15 @@ function updateTodo(todo){
     const clickedId = todo.data('id');
     const isDone = !todo.data('completed'); //false becomes true
     const updateData = {completed : isDone};
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
+    const id = localStorage.getItem("id");
     const current_user = sessionStorage.current_user
     $.ajax({
         method : "PUT",
         url: `${base_url}/api/todos/${clickedId}`,
         headers: {
             "token": token,
+            "id": id,
             "session": current_user
         },
         data: updateData
@@ -140,7 +148,8 @@ function updateTodo(todo){
 
 function removeTodo(todo){
     const clickedId = todo.data('id') 
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
+    const id = localStorage.getItem("id");
     const current_user = sessionStorage.current_user
    
     $.ajax({
@@ -148,6 +157,7 @@ function removeTodo(todo){
         url: `${base_url}/api/todos/${clickedId}`,
         headers: {
             "token": token,
+            "id":id,
             "session": current_user
         },
     })

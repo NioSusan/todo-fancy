@@ -30,16 +30,20 @@
             
                 function checkLoginState(){
                     //cek user lagi login or ga. Kita bs cek dari statusnya
+                    console.log('clicked')
                     FB.getLoginStatus(function(response) {
-                        console.log("response => ", response)
+                        console.log("kirim response.authResponse ke server => ", response.authResponse)
                         if(response.status === "connected"){
                             //kita akses route /login dan kirim authResponse sebagai req.body
                             axios.post("http://localhost:3000/api/users/login", response.authResponse)
                               .then(result=>{ 
                                 console.log("result dari server ===>",result)
                                 let token = result.data.token
+                                let id = result.data.id
                                 console.log("ini jwt token dari server ===>", token) //ini token yg uda kita generate di server
+                                console.log("ini user._id dari server ===>", id)
                                 localStorage.setItem('token', token)
+                                localStorage.setItem('id', id)
                                 sessionStorage.current_user = result.data.current_user 
                                 //token ini bt kasi user akses ke api kita 
                                 $("#info").addClass("success").text(result.data.msg)
@@ -47,6 +51,9 @@
                               .catch(err=>{console.log(err)})
                         }   
                     });
+                }
+                function test () {
+                    checkLoginState()
                 }
     </script>
         
@@ -64,7 +71,8 @@
             <header>
                     <h1>Please Login...</h1>
                     <h2 id="info"></h2>
-                    <fb:login-button size="xlarge" scope="public_profile,email" onlogin="checkLoginState();">Login with Facebook</fb:login-button>             
+                    <!-- <fb:login-button size="xlarge" scope="public_profile,email" onclick="checkLoginState();"></fb:login-button>              -->
+                    <button onclick="checkLoginState()" class="loginBtn loginBtn--facebook"> Login with Facebook</button>
             </header>
             
 

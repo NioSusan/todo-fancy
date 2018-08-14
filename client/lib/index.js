@@ -24,7 +24,6 @@ $(document).ready(function(){
             }
         })
        .then(todos=>{
-            console.log("ini todos dari server: ", todos)
             if(!todos.length){
                 $("#info").addClass("error").text("No todos");
             }else{

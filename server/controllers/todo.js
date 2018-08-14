@@ -3,13 +3,11 @@ const User = require("../models/user");
 
 module.exports = {
 	getTodos: (req, res) => {
-		console.log("req.headers ==>", req.headers);
 		let id = req.headers.id;
 		User.findById(id)
 			.populate("todos")
 			.then(user => {
                 let todos = user.todos;
-				console.log(`${user.name} wants to see her/his todos. Ada ${todos.length} =>`, todos);
 				res.status(200).json(todos);
 			})
 			.catch(err => {
@@ -24,14 +22,10 @@ module.exports = {
 		Todo.findOne({ name: todoName })
 			.then(todo => {
 				if (todo == null) {
-					console.log("Todo baru nih!");
 					Todo.create({ name: req.body.name }).then(newTodo => {
-						console.log("newTodo=====>", newTodo);
 						let todoId = newTodo._id;
-						console.log("todoId=====>", todoId);
 						User.findOneAndUpdate({ _id: id }, { $push: { todos: todoId } })
 							.then(success => {
-								console.log("success to push!", success);
 								res.status(201).json(newTodo);
 							})
 							.catch(error => {
@@ -39,7 +33,6 @@ module.exports = {
 							});
 					});
 				} else {
-					console.log("Uda ada di DB todo nih ", todo);
 					todoId = todo._id;
 					User.findOneAndUpdate({ _id: id }, { $push: { todos: todoId } })
 						.then(success => {

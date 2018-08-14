@@ -30,18 +30,17 @@
             
                 function checkLoginState(){
                     //cek user lagi login or ga. Kita bs cek dari statusnya
-                    console.log('clicked')
+                   
                     FB.getLoginStatus(function(response) {
-                        console.log("kirim response.authResponse ke server => ", response.authResponse)
+                       
                         if(response.status === "connected"){
                             //kita akses route /login dan kirim authResponse sebagai req.body
                             axios.post("http://localhost:3000/api/users/login", response.authResponse)
                               .then(result=>{ 
-                                console.log("result dari server ===>",result)
+                                
                                 let token = result.data.token
                                 let id = result.data.id
-                                console.log("ini jwt token dari server ===>", token) //ini token yg uda kita generate di server
-                                console.log("ini user._id dari server ===>", id)
+                               
                                 localStorage.setItem('token', token)
                                 localStorage.setItem('id', id)
                                 sessionStorage.current_user = result.data.current_user 
